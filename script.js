@@ -119,17 +119,33 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    function simulateSubmission() {
+    async function simulateSubmission() {
         // Change button state
         const originalText = btnText.textContent;
         btnText.textContent = 'Booking...';
         btnSubmit.disabled = true;
         btnSubmit.style.opacity = '0.8';
 
-        setTimeout(() => {
-            // Success & Redirect
-            window.location.href = 'submit.html';
-        }, 1500);
+        try {
+            const formData = new FormData(form);
+            const response = await fetch('https://api.web3forms.com/submit', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (response.ok) {
+                // Success & Redirect
+                window.location.href = 'submit.html';
+            } else {
+                throw new Error('Form submission failed');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            btnText.textContent = originalText;
+            btnSubmit.disabled = false;
+            btnSubmit.style.opacity = '1';
+            showError(btnSubmit, 'Something went wrong. Please try again.');
+        }
     }
 
     // Removed showToast function as it's no longer needed
