@@ -1,0 +1,381 @@
+:root {
+    --primary-color: #6366f1;
+    /* Indigo */
+    --primary-hover: #4f46e5;
+    --text-dark: #1e293b;
+    --text-light: #64748b;
+    --bg-gradient-start: #e0c3fc;
+    --bg-gradient-end: #8ec5fc;
+    --white: #ffffff;
+    --error: #ef4444;
+    --success: #22c55e;
+    --input-bg: #f8fafc;
+    --input-border: #e2e8f0;
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -2px rgb(0 0 0 / 0.05);
+    --radius: 16px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Roboto', sans-serif;
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+    padding: 20px;
+    color: var(--text-dark);
+}
+
+/* Background & Blobs */
+.background-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: radial-gradient(circle at 10% 20%, rgba(255, 255, 255, 0.4) 0%, transparent 20%),
+        radial-gradient(circle at 90% 80%, rgba(255, 255, 255, 0.4) 0%, transparent 20%);
+    pointer-events: none;
+    backdrop-filter: blur(100px);
+    /* Heavy blur for mesh effect */
+    z-index: -1;
+}
+
+.blob {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(40px);
+    z-index: -2;
+    animation: float 10s infinite alternate ease-in-out;
+    opacity: 0.7;
+}
+
+.blob-1 {
+    width: 300px;
+    height: 300px;
+    background: #a78bfa;
+    top: 10%;
+    left: 20%;
+    animation-delay: 0s;
+}
+
+.blob-2 {
+    width: 400px;
+    height: 400px;
+    background: #60a5fa;
+    bottom: 10%;
+    right: 20%;
+    animation-delay: -5s;
+}
+
+@keyframes float {
+    0% {
+        transform: translate(0, 0);
+    }
+
+    100% {
+        transform: translate(30px, 50px);
+    }
+}
+
+.container {
+    width: 100%;
+    max-width: 500px;
+    perspective: 1000px;
+}
+
+/* Updated Card Styling - Glassmorphism 2.0 */
+.booking-card {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    padding: 2.5rem;
+    border-radius: 24px;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    transform-style: preserve-3d;
+    transition: transform 0.3s ease;
+}
+
+.booking-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.2);
+}
+
+/* Header */
+.card-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.card-header h1 {
+    font-weight: 700;
+    font-size: 2.2rem;
+    color: var(--text-dark);
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.5px;
+}
+
+.card-header p {
+    color: var(--text-light);
+    font-weight: 400;
+}
+
+/* Form Layout */
+.form-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.form-row {
+    display: flex;
+    gap: 1rem;
+}
+
+.form-row .input-group {
+    flex: 1;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.input-group.full-width {
+    margin-top: 1.25rem;
+}
+
+/* Input Wrapper & Icons */
+.input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-icon {
+    position: absolute;
+    left: 1rem;
+    font-size: 1.1rem;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+/* Labels & Inputs */
+label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-left: 0.25rem;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    transition: color 0.3s;
+}
+
+input,
+select,
+textarea {
+    padding: 0.875rem 1rem 0.875rem 2.8rem;
+    /* Extra padding left for icon */
+    border: 1px solid transparent;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.6);
+    font-size: 1rem;
+    color: var(--text-dark);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    outline: none;
+    width: 100%;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: var(--primary-color);
+    background: var(--white);
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15), 0 4px 12px rgba(0, 0, 0, 0.05);
+    transform: translateY(-1px);
+}
+
+.input-group:focus-within label {
+    color: var(--primary-color);
+}
+
+/* Custom Select Arrow */
+.select-wrapper {
+    position: relative;
+}
+
+.select-wrapper::after {
+    content: '▼';
+    font-size: 0.8rem;
+    color: var(--text-light);
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
+select {
+    appearance: none;
+    cursor: pointer;
+}
+
+textarea {
+    resize: none;
+    min-height: 80px;
+}
+
+/* Error States */
+.error-message {
+    font-size: 0.75rem;
+    color: var(--error);
+    opacity: 0;
+    height: 0;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    margin-left: 0.25rem;
+}
+
+.input-group.error input,
+.input-group.error select {
+    border-color: var(--error);
+    background-color: #fef2f2;
+}
+
+.input-group.error .error-message {
+    opacity: 1;
+    height: auto;
+    margin-top: 0.25rem;
+}
+
+/* Submit Button with Shimmer */
+.btn-submit {
+    width: 100%;
+    margin-top: 2rem;
+    padding: 1.1rem;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+    color: var(--white);
+    border: none;
+    border-radius: 16px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 20px -5px rgba(99, 102, 241, 0.4);
+    position: relative;
+    overflow: hidden;
+    letter-spacing: 0.5px;
+}
+
+.btn-submit:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 15px 30px -5px rgba(99, 102, 241, 0.5);
+}
+
+.btn-submit:active {
+    transform: translateY(0);
+}
+
+/* Shimmer Effect */
+.shimmer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to right,
+            transparent 0%,
+            rgba(255, 255, 255, 0.3) 50%,
+            transparent 100%);
+    transform: skewX(-20deg) translateX(-150%);
+    transition: transform 0.5s;
+}
+
+.btn-submit:hover .shimmer {
+    transform: skewX(-20deg) translateX(150%);
+    transition: transform 0.7s ease-in-out;
+}
+
+/* Animations */
+@keyframes slideUpFade {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-enter {
+    animation: slideUpFade 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+/* Toast Notification */
+.toast {
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--text-dark);
+    color: var(--white);
+    padding: 1rem 2rem;
+    border-radius: 50px;
+    box-shadow: var(--shadow-lg);
+    opacity: 0;
+    transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+    z-index: 100;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.toast.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+}
+
+.toast::before {
+    content: '✓';
+    background: var(--success);
+    color: var(--white);
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 480px) {
+    .booking-card {
+        padding: 1.5rem;
+    }
+
+    .form-row {
+        flex-direction: column;
+        gap: 1.25rem;
+    }
+
+    h1 {
+        font-size: 1.75rem;
+    }
+}
