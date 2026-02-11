@@ -1,152 +1,82 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const form = document.getElementById('bookingForm');
-    const checkInInput = document.getElementById('checkIn');
-    const checkOutInput = document.getElementById('checkOut');
-    const roomTypeSelect = document.getElementById('roomType');
-    const toast = document.getElementById('toast');
-    const btnSubmit = document.querySelector('.btn-submit');
-    const btnText = document.querySelector('.btn-text');
-    const successIcon = document.querySelector('.success-icon');
+const form = document.getElementById("bookingForm");
+const checkin = document.getElementById("checkin");
+const checkout = document.getElementById("checkout");
+const room = document.getElementById("room");
+const total = document.getElementById("total");
+const username = document.getElementById("username");
+const phone = document.getElementById("phone");
+const guests = document.getElementById("guests");
 
-    // --- Date Initialization & Logic ---
+// Minimum date
+let today = new Date().toISOString().split("T")[0];
+checkin.min = today;
+checkout.min = today;
 
-    // Get today's date in YYYY-MM-DD format
-    const today = new Date().toISOString().split('T')[0];
+/* -------- PRICE CALCULATION -------- */
 
-    // Set min check-in date to today
-    checkInInput.setAttribute('min', today);
+checkin.addEventListener("change", () => {
+  checkout.min = checkin.value;
+  calculatePrice();
+});
 
-    // Update Check-out min date when Check-in changes
-    checkInInput.addEventListener('change', () => {
-        const checkInDate = checkInInput.value;
+checkout.addEventListener("change", calculatePrice);
+room.addEventListener("change", calculatePrice);
 
-        if (checkInDate) {
-            checkOutInput.removeAttribute('disabled');
+function calculatePrice() {
 
-            // Calculate next day for minimum checkout
-            const date = new Date(checkInDate);
-            date.setDate(date.getDate() + 1);
-            const nextDay = date.toISOString().split('T')[0];
+  if (!checkin.value || !checkout.value || !room.value) {
+    total.textContent = "₹0";
+    return;
+  }
 
-            checkOutInput.setAttribute('min', nextDay);
+  let start = new Date(checkin.value);
+  let end = new Date(checkout.value);
 
-            // If current checkout is invalid (before new min), clear it
-            if (checkOutInput.value && checkOutInput.value < nextDay) {
-                checkOutInput.value = '';
-                showError(checkOutInput, 'Please re-select check-out date');
-            } else {
-                clearError(checkOutInput);
-            }
-        } else {
-            checkOutInput.setAttribute('disabled', 'true');
-            checkOutInput.value = '';
-        }
-    });
+  let days = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
 
-    // --- Validation Functions ---
+  if (days <= 0) {
+    total.textContent = "₹0";
+    return;
+  }
 
-    function showError(input, message) {
-        const group = input.closest('.input-group');
-        group.classList.add('error');
-        const errorSpan = group.querySelector('.error-message');
-        if (errorSpan && message) {
-            errorSpan.textContent = message;
-        }
-    }
+  let price = days * Number(room.value);
 
-    function clearError(input) {
-        const group = input.closest('.input-group');
-        group.classList.remove('error');
-    }
+  total.textContent = "₹" + price.toLocaleString("en-IN");
+}
 
-    // Validate single input
-    function validateInput(input) {
-        if (input.checkValidity()) {
-            clearError(input);
-            return true;
-        } else {
-            // Customize messages based on type
-            let msg = input.validationMessage;
-            if (input.id === 'checkIn') msg = 'Please select a valid check-in date';
-            if (input.id === 'roomType') msg = 'Please select a room type';
+/* -------- FORM SUBMIT -------- */
 
-            showError(input, msg);
-            return false;
-        }
-    }
+form.addEventListener("submit", function(e){
+  e.preventDefault();
 
-    // Real-time validation on blur/input
-    const inputs = form.querySelectorAll('input, select, textarea');
-    inputs.forEach(input => {
-        input.addEventListener('blur', () => validateInput(input));
-        input.addEventListener('input', () => {
-            if (input.closest('.input-group').classList.contains('error')) {
-                validateInput(input);
-            }
-        });
-    });
+  if(!username.value.trim()){
+    alert("Please enter your name");
+    return;
+  }
 
-    // --- Form Submission ---
+  if(!phone.value.trim()){
+    alert("Please enter your phone number");
+    return;
+  }
 
-    form.addEventListener('submit', (e) => {
-        e.preventDefault();
+  if(Number(guests.value) <= 0){
+    alert("Please add at least one guest");
+    return;
+  }
 
-        let isValid = true;
+  if(total.textContent === "₹0"){
+    alert("Please select valid dates and room");
+    return;
+  }
 
-        // Validate all fields
-        inputs.forEach(input => {
-            if (input.hasAttribute('required') && !validateInput(input)) {
-                isValid = false;
-            }
-        });
+  // Save details
+  localStorage.setItem("username", username.value);
+  localStorage.setItem("phone", phone.value);
+  localStorage.setItem("checkin", checkin.value);
+  localStorage.setItem("checkout", checkout.value);
+  localStorage.setItem("room", room.options[room.selectedIndex].text);
+  localStorage.setItem("guests", guests.value);
+  localStorage.setItem("price", total.textContent);
 
-        if (isValid) {
-            // Simulate API call / Loading
-            simulateSubmission();
-        } else {
-            // Shake animation for invalid form
-            const card = document.querySelector('.booking-card');
-            card.animate([
-                { transform: 'translateX(0)' },
-                { transform: 'translateX(-10px)' },
-                { transform: 'translateX(10px)' },
-                { transform: 'translateX(-10px)' },
-                { transform: 'translateX(0)' }
-            ], {
-                duration: 400,
-                easing: 'ease-in-out'
-            });
-        }
-    });
-
-    async function simulateSubmission() {
-        // Change button state
-        const originalText = btnText.textContent;
-        btnText.textContent = 'Booking...';
-        btnSubmit.disabled = true;
-        btnSubmit.style.opacity = '0.8';
-
-        try {
-            const formData = new FormData(form);
-            const response = await fetch('https://api.web3forms.com/submit', {
-                method: 'POST',
-                body: formData
-            });
-
-            if (response.ok) {
-                // Success & Redirect
-                window.location.href = 'submit.html';
-            } else {
-                throw new Error('Form submission failed');
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            btnText.textContent = originalText;
-            btnSubmit.disabled = false;
-            btnSubmit.style.opacity = '1';
-            showError(btnSubmit, 'Something went wrong. Please try again.');
-        }
-    }
-
-    // Removed showToast function as it's no longer needed
+  window.location.href = "confirmation.html";
 });
