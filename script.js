@@ -7,12 +7,12 @@ const username = document.getElementById("username");
 const phone = document.getElementById("phone");
 const guests = document.getElementById("guests");
 
-// Minimum date
+// Minimum date setup
 let today = new Date().toISOString().split("T")[0];
 checkin.min = today;
 checkout.min = today;
 
-/* -------- PRICE CALCULATION -------- */
+/* ---------------- PRICE CALCULATION ---------------- */
 
 checkin.addEventListener("change", () => {
   checkout.min = checkin.value;
@@ -20,7 +20,13 @@ checkin.addEventListener("change", () => {
 });
 
 checkout.addEventListener("change", calculatePrice);
-room.addEventListener("change", calculatePrice);
+
+room.addEventListener("change", () => {
+  calculatePrice();
+  setGuestLimit();
+});
+
+/* ---------------- CALCULATE PRICE ---------------- */
 
 function calculatePrice() {
 
@@ -44,7 +50,58 @@ function calculatePrice() {
   total.textContent = "₹" + price.toLocaleString("en-IN");
 }
 
-/* -------- FORM SUBMIT -------- */
+/* ---------------- ROOM CAPACITY LIMIT ---------------- */
+
+function setGuestLimit() {
+
+  let selectedRoom = room.options[room.selectedIndex].text;
+
+  let maxLimit = 0;
+
+  if (selectedRoom.includes("Single")) {
+    maxLimit = 2;
+  }
+  else if (selectedRoom.includes("Double")) {
+    maxLimit = 4;
+  }
+  else if (selectedRoom.includes("Suite")) {
+    maxLimit = 4;
+  }
+
+  guests.max = maxLimit;
+
+  if (guests.value > maxLimit) {
+    guests.value = maxLimit;
+  }
+}
+
+/* ---------------- REAL-TIME HARD LIMIT ---------------- */
+
+guests.addEventListener("input", function() {
+
+  let selectedRoom = room.options[room.selectedIndex].text;
+  let maxLimit = 0;
+
+  if (selectedRoom.includes("Single")) {
+    maxLimit = 2;
+  }
+  else if (selectedRoom.includes("Double")) {
+    maxLimit = 4;
+  }
+  else if (selectedRoom.includes("Suite")) {
+    maxLimit = 4;
+  }
+
+  if (Number(guests.value) > maxLimit) {
+    guests.value = maxLimit;
+  }
+
+  if (Number(guests.value) < 1) {
+    guests.value = 1;
+  }
+});
+
+/* ---------------- FORM SUBMIT ---------------- */
 
 form.addEventListener("submit", function(e){
   e.preventDefault();
@@ -59,7 +116,9 @@ form.addEventListener("submit", function(e){
     return;
   }
 
-  if(Number(guests.value) <= 0){
+  let guestCount = Number(guests.value);
+
+  if(guestCount <= 0){
     alert("Please add at least one guest");
     return;
   }
@@ -69,13 +128,30 @@ form.addEventListener("submit", function(e){
     return;
   }
 
-  // Save details
+  let selectedRoom = room.options[room.selectedIndex].text;
+
+  if(selectedRoom.includes("Single") && guestCount > 2){
+    alert("Single room allows maximum 2 guests.");
+    return;
+  }
+
+  if(selectedRoom.includes("Double") && guestCount > 4){
+    alert("Double room allows maximum 4 guests.");
+    return;
+  }
+
+  if(selectedRoom.includes("Suite") && guestCount > 4){
+    alert("Suite allows maximum 4 guests.");
+    return;
+  }
+
+  // Save booking details
   localStorage.setItem("username", username.value);
   localStorage.setItem("phone", phone.value);
   localStorage.setItem("checkin", checkin.value);
   localStorage.setItem("checkout", checkout.value);
-  localStorage.setItem("room", room.options[room.selectedIndex].text);
-  localStorage.setItem("guests", guests.value);
+  localStorage.setItem("room", selectedRoom);
+  localStorage.setItem("guests", guestCount);
   localStorage.setItem("price", total.textContent);
 
   window.location.href = "confirmation.html";
